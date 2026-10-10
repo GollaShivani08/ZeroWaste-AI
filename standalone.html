@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZeroWaste AI — Perishable Demand & Shelf-Life Management</title>
+  <!-- Tailwind CSS via allowlisted CDN -->
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #090d16;
+      color: #f1f5f9;
+    }
+    .tab-active {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+      color: #34d399 !important;
+      border-color: rgba(16, 185, 129, 0.4) !important;
+    }
+    .tab-inactive {
+      background-color: transparent !important;
+      color: #94a3b8 !important;
+      border-color: transparent !important;
+    }
+    .tab-inactive:hover {
+      background-color: rgba(30, 41, 59, 0.5) !important;
+      color: #e2e8f0 !important;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-[#0f172a]/90 backdrop-blur sticky top-0 z-40 px-6 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-700 flex items-center justify-center text-xl shadow-lg border border-emerald-400/40">
+          🌿
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+              ZeroWaste <span class="text-emerald-400 font-extrabold">AI</span>
+            </h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Agentic v2.4 Enterprise
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">Autonomous Perishable Demand, FEFO & Dynamic Shelf-Life Engine</p>
+        </div>
+      </div>
+
+      <div class="flex items-center flex-wrap gap-2">
+        <div id="header-day-pill"></div>
+        <div id="header-weather-pill"></div>
+        <div id="header-mode-indicator" class="px-2 py-1 bg-slate-900 rounded-lg border border-slate-800"></div>
+
+        <label class="flex items-center gap-2 cursor-pointer bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg hover:border-slate-700 transition">
+          <input type="checkbox" id="toggle-autonomous-mode" class="sr-only peer">
+          <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600 relative"></div>
+          <span class="text-xs font-medium text-slate-300 select-none">Autonomous Pilot</span>
+        </label>
+      </div>
+    </div>
+  </header>
+
+  <!-- Simulation Sandbox Bar -->
+  <div class="bg-slate-900/90 border-b border-slate-800/80 px-6 py-2.5">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2 text-slate-400 font-medium">
+        <span class="text-emerald-400">⚡ Engine Controls:</span>
+        <button id="btn-run-cycle" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow transition">
+          ⚡ Run Agent Cycle
+        </button>
+        <button id="btn-advance-day" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-lg border border-slate-700 shadow transition">
+          ⏩ Next Day (+24h)
+        </button>
+        <button id="btn-fast-forward" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-lg border border-slate-700 shadow transition">
+          ⏩⏩ Fast Forward 3 Days
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 text-slate-400 font-medium">
+        <span>Environmental Stress:</span>
+        <button data-shock="HEATWAVE" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg transition">
+          🔥 Heatwave (+6°C)
+        </button>
+        <button data-shock="RAIN_STORM" class="px-2.5 py-1 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-lg transition">
+          🌧️ Rainstorm (-35% Traffic)
+        </button>
+        <button data-shock="WEEKEND_RUSH" class="px-2.5 py-1 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg transition">
+          🎉 Weekend Rush (+45%)
+        </button>
+        <button data-shock="NORMAL" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 rounded-lg transition">
+          🌤️ Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 space-y-6">
+
+    <!-- KPIs -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Food Diverted</div>
+        <div id="kpi-waste-diverted-kg" class="text-xl font-extrabold text-emerald-400 mt-1 font-mono">-- kg</div>
+        <div class="text-[11px] text-emerald-500/90 mt-0.5">↑ 92% recovery</div>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Recaptured Revenue</div>
+        <div id="kpi-revenue-recaptured" class="text-xl font-extrabold text-teal-300 mt-1 font-mono">$--</div>
+        <div class="text-[11px] text-teal-400/90 mt-0.5">Dynamic Markdowns</div>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">CO₂e Avoided</div>
+        <div id="kpi-co2e-avoided" class="text-xl font-extrabold text-cyan-400 mt-1 font-mono">-- kg</div>
+        <div class="text-[11px] text-cyan-400/90 mt-0.5">EPA WARM Standard</div>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Meals Provided</div>
+        <div id="kpi-meals-donated" class="text-xl font-extrabold text-purple-400 mt-1 font-mono">-- meals</div>
+        <div class="text-[11px] text-purple-400/90 mt-0.5">Community Shelters</div>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Current Waste %</div>
+        <div id="kpi-waste-ratio-val" class="text-xl font-extrabold text-emerald-300 mt-1 font-mono">--%</div>
+        <div id="kpi-baseline-ratio-val" class="text-[11px] text-slate-400 mt-0.5">14.2% standard</div>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 shadow-sm">
+        <div class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Prevention Rate</div>
+        <div id="kpi-spoilage-rate-val" class="text-xl font-extrabold text-amber-400 mt-1 font-mono">--%</div>
+        <div class="text-[11px] text-amber-400/90 mt-0.5">FEFO + Markdown AI</div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <nav class="flex items-center gap-1 border-b border-slate-800 pb-2 text-xs font-semibold overflow-x-auto">
+      <button data-tab-target="command-center" class="tab-active px-4 py-2 rounded-lg border transition flex items-center gap-2">
+        <span>🤖</span>
+        <span>Command Center & Reasoning Feed</span>
+        <span id="pending-decisions-count" class="px-1.5 py-0.2 rounded-full text-[10px] bg-rose-500 text-white font-mono hidden">0</span>
+      </button>
+      <button data-tab-target="inventory-radar" class="tab-inactive px-4 py-2 rounded-lg border transition flex items-center gap-2">
+        <span>🥬</span>
+        <span>Perishable Inventory & Shelf Radar</span>
+      </button>
+      <button data-tab-target="forecast-studio" class="tab-inactive px-4 py-2 rounded-lg border transition flex items-center gap-2">
+        <span>📊</span>
+        <span>Demand Forecast & Price Elasticity</span>
+      </button>
+      <button data-tab-target="esl-gallery" class="tab-inactive px-4 py-2 rounded-lg border transition flex items-center gap-2">
+        <span>🏷️</span>
+        <span>Electronic Shelf Labels (ESL)</span>
+      </button>
+      <button data-tab-target="esg-hub" class="tab-inactive px-4 py-2 rounded-lg border transition flex items-center gap-2">
+        <span>♻️</span>
+        <span>ESG & DQI Kitchen Upcycling</span>
+      </button>
+    </nav>
+
+    <!-- Tab 1: Command Center -->
+    <section data-tab-content="command-center" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <span>🛡️</span> Multi-Agent Action Approvals
+              </h3>
+              <p class="text-xs text-slate-400">Autonomous & Human-in-the-Loop decision recommendations</p>
+            </div>
+            <span class="text-xs text-slate-400">Review & Execute</span>
+          </div>
+
+          <div id="decisions-list-container" class="space-y-3"></div>
+
+          <!-- Executed Audit Trail -->
+          <div class="mt-6 pt-4 border-t border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <span>📋</span> Executed Optimizations & Audit Trail
+              </h4>
+              <span id="executed-history-count" class="text-[11px] font-mono text-emerald-400">0 executed</span>
+            </div>
+            <div id="executed-history-container" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col h-[560px]">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <h3 class="text-sm font-bold text-white">Live Agent Thought Stream</h3>
+            </div>
+            <span class="text-[11px] font-mono text-slate-400">5 Active Agents</span>
+          </div>
+          <div id="agent-live-logs" class="flex-1 overflow-y-auto pr-1 space-y-1"></div>
+          <div class="pt-2 border-t border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between font-mono">
+            <span>Forecaster • DecayMonitor • Markdown • Procurement • RescueRouter</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Inventory Radar -->
+    <section data-tab-content="inventory-radar" class="space-y-4 hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 p-3 rounded-xl border border-slate-800">
+        <div class="flex flex-wrap items-center gap-1.5 text-xs">
+          <button data-category-filter="ALL" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-semibold transition">All Categories</button>
+          <button data-category-filter="Produce" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition">🍌 Produce</button>
+          <button data-category-filter="Dairy" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition">🥛 Dairy</button>
+          <button data-category-filter="Bakery" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition">🥐 Bakery</button>
+          <button data-category-filter="Meat & Seafood" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition">🐟 Meat</button>
+          <button data-category-filter="Prepared Deli" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white transition">🥗 Deli</button>
+        </div>
+        <div class="w-full sm:w-64">
+          <input type="text" id="inventory-search" placeholder="Search SKU or lot..." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-800 bg-slate-950/70 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                <th class="py-3 px-4">Item & Lot Details</th>
+                <th class="py-3 px-4">Expiry Window</th>
+                <th class="py-3 px-4">DQI & Quality Grade</th>
+                <th class="py-3 px-4">Shelf Stock</th>
+                <th class="py-3 px-4">Current Price</th>
+                <th class="py-3 px-4">Direct Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: Forecast Studio -->
+    <section data-tab-content="forecast-studio" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div>
+            <h3 class="text-sm font-bold text-white uppercase tracking-wider">Interactive Forecast Sandbox</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Simulate price elasticity of demand curves</p>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Select Perishable SKU:</label>
+            <select id="forecast-sku-select" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"></select>
+          </div>
+          <div id="forecast-sku-info" class="p-3 bg-slate-950/60 rounded-lg border border-slate-800"></div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-300">Test Markdown Discount:</span>
+              <span id="elasticity-discount-val" class="text-amber-400 font-mono font-bold">30%</span>
+            </div>
+            <input type="range" id="elasticity-slider" min="0" max="70" step="5" value="30" class="w-full accent-emerald-500 cursor-pointer">
+            <div class="flex items-center justify-between text-[11px] text-slate-500">
+              <span>0% (Full MSRP)</span>
+              <span>35% (Velocity Boost)</span>
+              <span>70% (Flash Clearance)</span>
+            </div>
+          </div>
+          <div class="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-300 space-y-1">
+            <div class="font-bold flex items-center gap-1"><span>💡</span> Demand Response Insight:</div>
+            <p class="text-slate-300 text-[11px] leading-relaxed">
+              Perishables exhibit non-linear price elasticity (<span class="font-mono text-emerald-400">ε &gt; 1.8</span>). Lowering price clears aging units before expiry while generating immediate cash recovery instead of 100% loss.
+            </p>
+          </div>
+        </div>
+
+        <div class="lg:col-span-8 bg-slate-900/90 border border-slate-800 rounded-xl p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-white">7-Day Demand Velocity Projection</h3>
+              <p class="text-xs text-slate-400">Baseline Demand vs Price-Stimulated Clearance Velocity</p>
+            </div>
+            <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-400">Units / Day</span>
+          </div>
+          <div class="flex-1 min-h-[340px] flex items-center justify-center">
+            <canvas id="forecast-chart-canvas" width="680" height="340" class="w-full h-full"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: ESL Gallery -->
+    <section data-tab-content="esl-gallery" class="space-y-4 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <span>🏷️</span> Electronic Shelf Label (ESL) Digital Mesh Simulator
+          </h3>
+          <p class="text-xs text-slate-400">Direct integration with retail e-ink shelf tags for real-time dynamic markdowns</p>
+        </div>
+        <span class="inline-flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          ESL Sub-GHz Gateway Online
+        </span>
+      </div>
+      <div id="esl-gallery-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- Tab 5: ESG & DQI Hub -->
+    <section data-tab-content="esg-hub" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 rounded-xl p-5 flex flex-col">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-white">Food Waste Prevention Trend (kg)</h3>
+              <p class="text-xs text-slate-400">ZeroWaste AI Diverted vs Traditional Supermarket Waste</p>
+            </div>
+            <span class="text-xs font-mono text-emerald-400">UN SDG 12.3 Aligned</span>
+          </div>
+          <div class="flex-1 min-h-[280px] flex items-center justify-center">
+            <canvas id="esg-trend-canvas" width="620" height="280" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 space-y-3">
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-5 space-y-3">
+            <h4 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>🤝</span> Community Food Rescue Network
+            </h4>
+            <p class="text-xs text-slate-400 leading-relaxed">
+              Automated cold-chain API connection with local food banks & homeless shelters. IRS 170(e)(3) enhanced tax deduction receipts.
+            </p>
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center justify-between p-2 bg-slate-950 rounded-lg border border-slate-800">
+                <span class="text-slate-400">Partner Charity:</span>
+                <span class="text-slate-200 font-semibold">City Harvest / Metro Rescue Alliance</span>
+              </div>
+              <div class="flex items-center justify-between p-2 bg-slate-950 rounded-lg border border-slate-800">
+                <span class="text-slate-400">Meals Dispatched:</span>
+                <span class="text-purple-400 font-mono font-bold">114 Nutritious Meals</span>
+              </div>
+            </div>
+            <button id="btn-open-manifest" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs flex items-center justify-center gap-1.5 transition shadow">
+              <span>📄</span> View IRS 170(e)(3) Food Rescue Waybill
+            </button>
+          </div>
+
+          <!-- DQI Routing Matrix -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5 mb-2">
+              <span>📊</span> DQI (Decay Quality Index) Routing Matrix
+            </h4>
+            <div class="space-y-1.5 text-[11px]">
+              <div class="flex items-center justify-between p-2 rounded bg-slate-950 border border-slate-800/80">
+                <span class="font-semibold text-emerald-400">DQI 90–100 (Grade A)</span>
+                <span class="text-slate-400">Prime Retail • Full MSRP</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded bg-slate-950 border border-slate-800/80">
+                <span class="font-semibold text-blue-400">DQI 70–89 (Grade B)</span>
+                <span class="text-slate-400">Aging Prime • 20-35% ESL Markdown</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded bg-slate-950 border border-slate-800/80">
+                <span class="font-semibold text-amber-400">DQI 40–69 (Grade C)</span>
+                <span class="text-slate-400">Kitchen Prep • In-Store Upcycling</span>
+              </div>
+              <div class="flex items-center justify-between p-2 rounded bg-slate-950 border border-slate-800/80">
+                <span class="font-semibold text-rose-400">DQI &lt; 40 (Grade D)</span>
+                <span class="text-slate-400">Emergency Rescue • Charity Donation</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deli Kitchen Upcycling Recipes Section -->
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <span>👨‍🍳</span> In-Store Deli Kitchen Culinary Upcycling Work Orders
+            </h3>
+            <p class="text-xs text-slate-400">Transforming near-expiry perishable ingredients into high-margin prepared foods</p>
+          </div>
+          <span class="text-xs text-emerald-400 font-mono">Value Creation Multiplier: ~3.2x</span>
+        </div>
+        <div id="esg-recipes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modals -->
+  <div id="modal-rationale" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 id="modal-rationale-title" class="text-sm font-bold text-white">Agent Rationale</h3>
+        <button data-modal-close class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div id="modal-rationale-body"></div>
+      <div class="flex justify-end pt-2">
+        <button data-modal-close class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg">
+          Close Inspector
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-esl" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-sm font-bold text-white">ESL Wireless E-Ink Terminal</h3>
+          <p class="text-[11px] text-slate-400">Sub-GHz IEEE 802.15.4 Retail Shelf Network</p>
+        </div>
+        <button data-modal-close class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div id="modal-esl-card-container"></div>
+      <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-3">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-300 font-semibold">Adjust Dynamic Discount:</span>
+          <div class="flex items-center gap-1.5" id="esl-discount-buttons">
+            <button data-set-discount="0.15" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-mono">-15%</button>
+            <button data-set-discount="0.30" class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 text-xs font-mono font-bold">-30%</button>
+            <button data-set-discount="0.50" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-mono">-50%</button>
+            <button data-set-discount="0.70" class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-mono">-70%</button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono">
+          <span>Signal: <b class="text-emerald-400 font-normal">-64 dBm (99.8%)</b></span>
+          <span>Battery: <b class="text-emerald-400 font-normal">98% (Coin Cell)</b></span>
+        </div>
+        <button id="btn-transmit-esl-sync" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs flex items-center justify-center gap-1.5 transition shadow">
+          <span>📡</span> Transmit & Sync with Physical Shelf Tag
+        </button>
+        <div id="esl-sync-feedback" class="text-center text-[11px] text-emerald-400 font-mono hidden">
+          ✓ Packet Confirmed: Tag E-Ink Refreshed in 420ms
+        </div>
+      </div>
+      <div class="flex justify-end pt-1">
+        <button data-modal-close class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg">
+          Close ESL Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-telemetry" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 id="modal-telemetry-title" class="text-sm font-bold text-white">Cold-Chain & DQI Telemetry Inspector</h3>
+          <p class="text-[11px] text-slate-400">IoT Chiller Temperature & Biochemical Spoilage Analysis</p>
+        </div>
+        <button data-modal-close class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div id="modal-telemetry-body" class="space-y-4"></div>
+      <div class="flex justify-end pt-1">
+        <button data-modal-close class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg">
+          Close Telemetry
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-manifest" class="modal-backdrop fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h3 class="text-sm font-bold text-white">Official Food Rescue Manifest & Tax Certificate</h3>
+          <p class="text-[11px] text-slate-400">IRS Section 170(e)(3) Enhanced Charitable Inventory Waybill</p>
+        </div>
+        <button data-modal-close class="text-slate-400 hover:text-white text-lg">&times;</button>
+      </div>
+      <div id="modal-manifest-body" class="space-y-4 max-h-[480px] overflow-y-auto pr-1"></div>
+      <div class="flex items-center justify-between border-t border-slate-800 pt-3">
+        <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700">
+          🖨️ Print Waybill PDF
+        </button>
+        <button data-modal-close class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow">
+          Done & Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inlined App Script -->
+  <script>
+    const INITIAL_SKUS = [
+      { id: 'SKU-001', name: 'Organic Cavendish Bananas', category: 'Produce', unit: 'kg', baseCost: 0.85, basePrice: 1.99, shelfLifeDays: 5, optimalTemp: 13.0, currentTemp: 14.2, elasticity: 1.85, minSafetyStock: 25, supplierLeadTimeDays: 1, co2PerKg: 1.1, waterPerKg: 790, upcyclingRecipe: { dish: 'Artisan Banana Walnut Bread', department: 'Deli Bakery', yieldPerKg: 1.4, recoveryValue: 5.50, description: 'Convert overripe bananas (sugar content peak) into high-margin bakery loaves.' }, donationEligible: true, icon: '🍌' },
+      { id: 'SKU-002', name: 'Fresh Strawberries (450g punnet)', category: 'Produce', unit: 'punnet', baseCost: 2.10, basePrice: 4.49, shelfLifeDays: 4, optimalTemp: 2.0, currentTemp: 2.8, elasticity: 2.40, minSafetyStock: 20, supplierLeadTimeDays: 2, co2PerKg: 1.8, waterPerKg: 380, upcyclingRecipe: { dish: 'Strawberry Compote & Parfait', department: 'Prepared Deli', yieldPerKg: 1.8, recoveryValue: 6.20, description: 'Macerate soft berries for morning yogurt parfaits and smoothie bowls.' }, donationEligible: true, icon: '🍓' },
+      { id: 'SKU-003', name: 'Organic Hass Avocados (3-Pack)', category: 'Produce', unit: 'pack', baseCost: 2.40, basePrice: 4.99, shelfLifeDays: 6, optimalTemp: 7.0, currentTemp: 7.5, elasticity: 1.65, minSafetyStock: 15, supplierLeadTimeDays: 2, co2PerKg: 2.5, waterPerKg: 1980, upcyclingRecipe: { dish: 'Fresh Guacamole Bowls (250g)', department: 'Prepared Deli', yieldPerKg: 1.2, recoveryValue: 5.99, description: 'Mash ripe avocados with lime, cilantro, and sea salt for grab-and-go deli counter.' }, donationEligible: true, icon: '🥑' },
+      { id: 'SKU-004', name: 'Hydroponic Baby Spinach (300g)', category: 'Produce', unit: 'pack', baseCost: 1.25, basePrice: 2.99, shelfLifeDays: 5, optimalTemp: 3.0, currentTemp: 3.6, elasticity: 1.95, minSafetyStock: 18, supplierLeadTimeDays: 1, co2PerKg: 1.4, waterPerKg: 240, upcyclingRecipe: { dish: 'Garlic Spinach Quiche Slice', department: 'Hot Deli Bar', yieldPerKg: 2.0, recoveryValue: 4.50, description: 'Blanch tender leaves for artisanal quiches and hot buffet pasta dishes.' }, donationEligible: true, icon: '🥬' },
+      { id: 'SKU-005', name: 'Whole Milk 3.8% (1 Gallon)', category: 'Dairy', unit: 'gallon', baseCost: 2.15, basePrice: 3.99, shelfLifeDays: 9, optimalTemp: 3.0, currentTemp: 3.4, elasticity: 1.35, minSafetyStock: 30, supplierLeadTimeDays: 1, co2PerKg: 3.2, waterPerKg: 1020, upcyclingRecipe: { dish: 'In-house Ricotta & Pastry Custard', department: 'Deli Bakery', yieldPerKg: 0.35, recoveryValue: 7.00, description: 'Curdle with lemon juice for fresh ricotta or deli kitchen dessert bases.' }, donationEligible: true, icon: '🥛' },
+      { id: 'SKU-006', name: 'Greek Yogurt Plain (900g)', category: 'Dairy', unit: 'tub', baseCost: 2.60, basePrice: 5.49, shelfLifeDays: 14, optimalTemp: 4.0, currentTemp: 4.2, elasticity: 1.45, minSafetyStock: 16, supplierLeadTimeDays: 2, co2PerKg: 2.9, waterPerKg: 850, upcyclingRecipe: { dish: 'Tzatziki Dip & Herb Marinade', department: 'Prepared Deli', yieldPerKg: 1.5, recoveryValue: 6.50, description: 'Blend with cucumber, dill, and garlic for retail appetizer dip pots.' }, donationEligible: true, icon: '🥣' },
+      { id: 'SKU-008', name: 'Rustic Sourdough Boule (500g)', category: 'Bakery', unit: 'loaf', baseCost: 1.10, basePrice: 4.29, shelfLifeDays: 3, optimalTemp: 20.0, currentTemp: 21.0, elasticity: 2.60, minSafetyStock: 14, supplierLeadTimeDays: 1, co2PerKg: 0.9, waterPerKg: 650, upcyclingRecipe: { dish: 'Garlic Herb Sourdough Croutons', department: 'Bakery Resale', yieldPerKg: 2.5, recoveryValue: 4.99, description: 'Dice day-old boules, toss with olive oil & herbs, slow bake into croutons.' }, donationEligible: true, icon: '🥖' },
+      { id: 'SKU-009', name: 'Butter Croissants (4-Pack)', category: 'Bakery', unit: 'pack', baseCost: 1.80, basePrice: 4.99, shelfLifeDays: 2, optimalTemp: 21.0, currentTemp: 21.5, elasticity: 2.80, minSafetyStock: 12, supplierLeadTimeDays: 1, co2PerKg: 2.2, waterPerKg: 1400, upcyclingRecipe: { dish: 'Twice-Baked Almond Croissant', department: 'Deli Bakery', yieldPerKg: 1.0, recoveryValue: 6.99, description: 'Soak in almond syrup, top with frangipane cream and toasted sliced almonds.' }, donationEligible: true, icon: '🥐' },
+      { id: 'SKU-010', name: 'Pasture-Raised Chicken Breast (1kg)', category: 'Meat & Seafood', unit: 'pack', baseCost: 5.80, basePrice: 11.49, shelfLifeDays: 5, optimalTemp: 1.0, currentTemp: 1.9, elasticity: 1.90, minSafetyStock: 15, supplierLeadTimeDays: 2, co2PerKg: 6.9, waterPerKg: 4325, upcyclingRecipe: { dish: 'Pulled Roasted Chicken Salad', department: 'Hot Deli Bar', yieldPerKg: 1.2, recoveryValue: 12.99, description: 'Season with rotisserie spices, slow roast and shred for deli sandwich fillings.' }, donationEligible: false, icon: '🍗' },
+      { id: 'SKU-011', name: 'Atlantic Salmon Fillet (500g)', category: 'Meat & Seafood', unit: 'pack', baseCost: 7.20, basePrice: 14.99, shelfLifeDays: 3, optimalTemp: 0.5, currentTemp: 1.2, elasticity: 2.20, minSafetyStock: 10, supplierLeadTimeDays: 2, co2PerKg: 5.4, waterPerKg: 2200, upcyclingRecipe: { dish: 'Smoked Salmon Chowder', department: 'Hot Deli Bar', yieldPerKg: 2.2, recoveryValue: 8.99, description: 'Flake into creamy potato leek broth for hot soup station lunch service.' }, donationEligible: false, icon: '🐟' },
+      { id: 'SKU-012', name: 'Caprese Salad Bowl (350g)', category: 'Prepared Deli', unit: 'bowl', baseCost: 2.70, basePrice: 6.49, shelfLifeDays: 3, optimalTemp: 3.5, currentTemp: 4.1, elasticity: 2.50, minSafetyStock: 12, supplierLeadTimeDays: 1, co2PerKg: 3.8, waterPerKg: 1100, upcyclingRecipe: { dish: 'Rustic Tomato Basil Pasta Sauce', department: 'Hot Deli Bar', yieldPerKg: 1.0, recoveryValue: 7.50, description: 'Cook down mozzarella and tomatoes into rich pasta bake toppings.' }, donationEligible: true, icon: '🥗' }
+    ];
+
+    const INITIAL_BATCHES = [
+      { id: 'LOT-PRD-101', skuId: 'SKU-001', initialQty: 50, shelfQty: 18, receivedDay: 1, expiryDay: 3, hoursRemaining: 18, discount: 0.20, status: 'marked_down', shelfPosition: 'front', decayScore: 42 },
+      { id: 'LOT-PRD-102', skuId: 'SKU-001', initialQty: 45, shelfQty: 38, receivedDay: 2, expiryDay: 6, hoursRemaining: 90, discount: 0, status: 'optimal', shelfPosition: 'back', decayScore: 88 },
+      { id: 'LOT-STR-201', skuId: 'SKU-002', initialQty: 40, shelfQty: 14, receivedDay: 1, expiryDay: 2, hoursRemaining: 10, discount: 0.40, status: 'marked_down', shelfPosition: 'front', decayScore: 28 },
+      { id: 'LOT-STR-202', skuId: 'SKU-002', initialQty: 35, shelfQty: 32, receivedDay: 2, expiryDay: 5, hoursRemaining: 74, discount: 0, status: 'optimal', shelfPosition: 'back', decayScore: 92 },
+      { id: 'LOT-AVO-301', skuId: 'SKU-003', initialQty: 30, shelfQty: 22, receivedDay: 1, expiryDay: 5, hoursRemaining: 68, discount: 0, status: 'optimal', shelfPosition: 'back', decayScore: 78 },
+      { id: 'LOT-SPN-401', skuId: 'SKU-004', initialQty: 35, shelfQty: 19, receivedDay: 1, expiryDay: 3, hoursRemaining: 22, discount: 0, status: 'aging', shelfPosition: 'front', decayScore: 48 },
+      { id: 'LOT-MLK-501', skuId: 'SKU-005', initialQty: 60, shelfQty: 26, receivedDay: 1, expiryDay: 4, hoursRemaining: 36, discount: 0, status: 'aging', shelfPosition: 'front', decayScore: 56 },
+      { id: 'LOT-SOU-801', skuId: 'SKU-008', initialQty: 24, shelfQty: 12, receivedDay: 1, expiryDay: 2, hoursRemaining: 12, discount: 0.30, status: 'marked_down', shelfPosition: 'front', decayScore: 35 },
+      { id: 'LOT-CRO-901', skuId: 'SKU-009', initialQty: 20, shelfQty: 8, receivedDay: 1, expiryDay: 2, hoursRemaining: 8, discount: 0.50, status: 'marked_down', shelfPosition: 'front', decayScore: 22 },
+      { id: 'LOT-SAL-1101', skuId: 'SKU-011', initialQty: 16, shelfQty: 7, receivedDay: 1, expiryDay: 2, hoursRemaining: 14, discount: 0.25, status: 'marked_down', shelfPosition: 'front', decayScore: 38 },
+      { id: 'LOT-CAP-1201', skuId: 'SKU-012', initialQty: 20, shelfQty: 9, receivedDay: 1, expiryDay: 2, hoursRemaining: 11, discount: 0.35, status: 'marked_down', shelfPosition: 'front', decayScore: 30 }
+    ];
+
+    const storeState = {
+      currentDay: 2,
+      dayOfWeek: 'Friday',
+      weather: { condition: 'Sunny & Warm', temperatureC: 24.5, icon: '☀️', trafficMultiplier: 1.15 },
+      autonomousMode: false,
+      baselineStats: { totalWasteKg: 148.5, totalWasteValue: 842.10, wastePercentage: 14.2 },
+      aiStats: { wasteDivertedKg: 122.4, revenueRecaptured: 689.50, co2eAvoidedKg: 318.2, mealsDonated: 114, currentWastePercentage: 2.4, spoilagePreventionRate: 91.8 }
+    };
+
+    let skus = JSON.parse(JSON.stringify(INITIAL_SKUS));
+    let batches = JSON.parse(JSON.stringify(INITIAL_BATCHES));
+    let pendingDecisions = [];
+    let executedHistory = [];
+    let agentLogs = [];
+    let activeTab = 'command-center';
+    let selectedCategory = 'ALL';
+    let searchQuery = '';
+    let selectedSkuForForecast = 'SKU-001';
+    let simulatedDiscount = 0.30;
+    let currentEslBatchId = null;
+    let currentEslDiscount = 0.30;
+    let historyDays = [
+      { day: 1, baselineWasteKg: 135, wasteDivertedKg: 110 },
+      { day: 2, baselineWasteKg: 148, wasteDivertedKg: 122 }
+    ];
+
+    function log(sender, message, level = 'info') {
+      agentLogs.push({ timestamp: new Date().toLocaleTimeString(), sender, message, level });
+      if (agentLogs.length > 50) agentLogs.shift();
+    }
+
+    // Mathematical Models
+    function calcFreshness(elapsed, totalHours, ambient, optimal) {
+      if (elapsed >= totalHours) return 0;
+      const thermal = 1.0 + Math.max(0, ambient - optimal) * 0.08;
+      const effectiveElapsed = elapsed * thermal;
+      const ratio = Math.min(1.0, effectiveElapsed / totalHours);
+      return Math.round(100 * Math.pow(1 - ratio, 1.6) * 10) / 10;
+    }
+
+    function calculateDQI(freshness, tempDelta, hours) {
+      const tempPen = Math.max(0, tempDelta * 4);
+      const urgPen = hours <= 12 ? 15 : (hours <= 24 ? 8 : 0);
+      const score = Math.max(0, Math.min(100, Math.round(freshness - tempPen - urgPen)));
+      if (score < 40) return { score, grade: 'Grade D (Rescue)', badgeClass: 'text-rose-400 bg-rose-500/10 border-rose-500/30' };
+      if (score < 70) return { score, grade: 'Grade C (Deli Prep)', badgeClass: 'text-amber-400 bg-amber-500/10 border-amber-500/30' };
+      if (score < 90) return { score, grade: 'Grade B (Markdown)', badgeClass: 'text-blue-400 bg-blue-500/10 border-blue-500/30' };
+      return { score, grade: 'Grade A (Prime)', badgeClass: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' };
+    }
+
+    function forecastDemand(sku, dayOfWeek, weather, discount) {
+      const dayWeights = { 'Monday': 0.85, 'Tuesday': 0.8, 'Wednesday': 0.9, 'Thursday': 1.05, 'Friday': 1.35, 'Saturday': 1.5, 'Sunday': 1.25 };
+      const base = sku.minSafetyStock * 0.95;
+      const dayFactor = dayWeights[dayOfWeek] || 1.0;
+      const weatherFactor = weather.trafficMultiplier || 1.0;
+      const priceRatio = Math.max(0.2, 1.0 - discount);
+      const elasticityFactor = Math.pow(priceRatio, -sku.elasticity);
+      const expected = base * dayFactor * weatherFactor * elasticityFactor;
+      const variance = Math.sqrt(expected);
+      return {
+        p50: Math.round(expected * 10) / 10,
+        p10: Math.max(0, Math.round((expected - 1.28 * variance) * 10) / 10),
+        p90: Math.round((expected + 1.28 * variance) * 10) / 10,
+        effectivePrice: Math.round(sku.basePrice * (1.0 - discount) * 100) / 100,
+        uplift: Math.round((elasticityFactor - 1) * 100)
+      };
+    }
+
+    // Multi-Agent Cycle
+    async function runAgentCycle() {
+      log('SYSTEM', `Executing Multi-Agent Decision Loop for Day ${storeState.currentDay}...`, 'info');
+      pendingDecisions = [];
+
+      // Decay & FEFO Check
+      batches.forEach(b => {
+        const sku = skus.find(s => s.id === b.skuId);
+        if (!sku || b.shelfQty <= 0) return;
+        const totalH = sku.shelfLifeDays * 24;
+        b.decayScore = calcFreshness(totalH - b.hoursRemaining, totalH, sku.currentTemp, sku.optimalTemp);
+
+        if (b.shelfPosition === 'back' && b.hoursRemaining < 48) {
+          log('DecayMonitorAgent', `FEFO Inversion: Older lot ${b.id} (${b.hoursRemaining}h left) placed in back!`, 'warning');
+          pendingDecisions.push({
+            id: `DEC-FEFO-${b.id}-${Date.now()}`,
+            agent: 'DecayMonitorAgent',
+            category: 'FEFO_ROTATION',
+            title: `Physical Shelf Rotation: ${sku.name}`,
+            badge: 'Floor Task',
+            batchId: b.id,
+            actionRequired: `Move Lot ${b.id} to FRONT of physical display.`,
+            confidence: 0.98,
+            thoughtProcess: [`Lot ${b.id} expires in ${b.hoursRemaining}h but is positioned behind newer inventory. Physical rotation required immediately.`],
+            status: storeState.autonomousMode ? 'APPROVED_AUTONOMOUS' : 'PENDING'
+          });
+        }
+      });
+
+      // Markdown Optimization
+      batches.forEach(b => {
+        const sku = skus.find(s => s.id === b.skuId);
+        if (!sku || b.shelfQty <= 0) return;
+
+        if (b.hoursRemaining <= 36) {
+          const tiers = [0.20, 0.35, 0.50, 0.65];
+          let chosen = 0.20;
+          for (const t of tiers) {
+            const f = forecastDemand(sku, storeState.dayOfWeek, storeState.weather, t);
+            if ((f.p50 / 12) * Math.min(b.hoursRemaining, 12) >= b.shelfQty * 0.85 || t === 0.65) {
+              chosen = t;
+              break;
+            }
+          }
+          if (chosen > b.discount) {
+            const newPrice = (sku.basePrice * (1.0 - chosen)).toFixed(2);
+            log('MarkdownAgent', `Optimized Markdown: ${sku.name} -> -${Math.round(chosen * 100)}% ($${newPrice})`, 'info');
+            pendingDecisions.push({
+              id: `DEC-MD-${b.id}-${Date.now()}`,
+              agent: 'MarkdownAgent',
+              category: 'DYNAMIC_MARKDOWN',
+              title: `Apply ${Math.round(chosen * 100)}% Markdown on ${sku.name}`,
+              badge: 'ESL Sync',
+              batchId: b.id,
+              discount: chosen,
+              newPrice: newPrice,
+              actionRequired: `Update ESL Tag to $${newPrice} and broadcast flash alert.`,
+              confidence: 0.94,
+              thoughtProcess: [
+                `Shelf stock (${b.shelfQty} ${sku.unit}) faces expiration in ${b.hoursRemaining}h.`,
+                `Applying -${Math.round(chosen * 100)}% markdown stimulates velocity using elasticity ε=${sku.elasticity}.`,
+                `Prevents $${(b.shelfQty * sku.baseCost).toFixed(2)} total loss.`
+              ],
+              status: storeState.autonomousMode ? 'APPROVED_AUTONOMOUS' : 'PENDING'
+            });
+          }
+        }
+      });
+
+      // Procurement Reorder Check
+      skus.forEach(s => {
+        const usable = batches.filter(b => b.skuId === s.id && b.hoursRemaining > 12).reduce((sum, b) => sum + b.shelfQty, 0);
+        const f = forecastDemand(s, storeState.dayOfWeek, storeState.weather, 0);
+        if (usable < s.minSafetyStock * 0.5) {
+          const orderQty = Math.round(s.minSafetyStock * 1.2);
+          log('ProcurementAgent', `Replenishment Triggered: ${s.name} (+${orderQty} units)`, 'info');
+          pendingDecisions.push({
+            id: `DEC-PO-${s.id}-${Date.now()}`,
+            agent: 'ProcurementAgent',
+            category: 'PURCHASE_ORDER',
+            title: `Reorder ${orderQty} units of ${s.name}`,
+            badge: 'Supply Chain',
+            skuId: s.id,
+            quantity: orderQty,
+            estimatedCost: Math.round(orderQty * s.baseCost * 100) / 100,
+            actionRequired: `Issue Purchase Order ${orderQty} units to certified supplier.`,
+            confidence: 0.92,
+            thoughtProcess: [`Usable inventory for ${s.name} is ${usable} units, well below safety threshold ${s.minSafetyStock}. Issuing restock PO.`],
+            status: storeState.autonomousMode ? 'APPROVED_AUTONOMOUS' : 'PENDING'
+          });
+        }
+      });
+
+      // Rescue & Upcycling
+      batches.forEach(b => {
+        const sku = skus.find(s => s.id === b.skuId);
+        if (!sku || b.shelfQty <= 0 || b.hoursRemaining > 14) return;
+
+        if (sku.upcyclingRecipe) {
+          log('RescueRouterAgent', `Culinary Upcycling: ${sku.name} -> ${sku.upcyclingRecipe.dish}`, 'success');
+          pendingDecisions.push({
+            id: `DEC-RSC-${b.id}-${Date.now()}`,
+            agent: 'RescueRouterAgent',
+            category: 'DELI_KITCHEN_UPCYCLING',
+            title: `Transfer ${sku.name} to Deli Kitchen for "${sku.upcyclingRecipe.dish}"`,
+            badge: 'Kitchen Upcycling',
+            batchId: b.id,
+            actionRequired: `Transfer ${b.shelfQty} ${sku.unit} to ${sku.upcyclingRecipe.department} prep table.`,
+            confidence: 0.96,
+            thoughtProcess: [
+              `Lot ${b.id} has ${b.hoursRemaining}h left on shelf.`,
+              `Transform into "${sku.upcyclingRecipe.dish}" generating $${(b.shelfQty * sku.upcyclingRecipe.recoveryValue).toFixed(2)} in deli retail value.`,
+              `Diverts ${b.shelfQty}kg of landfill food waste.`
+            ],
+            status: storeState.autonomousMode ? 'APPROVED_AUTONOMOUS' : 'PENDING'
+          });
+        } else if (sku.donationEligible) {
+          log('RescueRouterAgent', `Donation: ${sku.name} -> Local Shelter`, 'success');
+          pendingDecisions.push({
+            id: `DEC-DON-${b.id}-${Date.now()}`,
+            agent: 'RescueRouterAgent',
+            category: 'FOOD_BANK_DONATION',
+            title: `Generate Food Rescue Donation for ${sku.name} (${b.shelfQty} units)`,
+            badge: 'Charity Donation',
+            batchId: b.id,
+            actionRequired: `Package into cold bins for 5:30 PM partner charity pickup.`,
+            confidence: 0.95,
+            thoughtProcess: [
+              `Batch ${b.id} within ${b.hoursRemaining}h of expiration. Item is USDA compliant.`,
+              `Provides ${Math.round(b.shelfQty / 0.5)} nutritious meals for local families.`
+            ],
+            status: storeState.autonomousMode ? 'APPROVED_AUTONOMOUS' : 'PENDING'
+          });
+        }
+      });
+
+      if (storeState.autonomousMode) {
+        pendingDecisions.forEach(d => executeDecision(d.id));
+      }
+    }
+
+    function executeDecision(id) {
+      const dec = pendingDecisions.find(d => d.id === id);
+      if (!dec) return;
+      const b = batches.find(batch => batch.id === dec.batchId);
+
+      if (dec.category === 'DYNAMIC_MARKDOWN' && b) {
+        b.discount = dec.discount;
+        b.status = 'marked_down';
+        storeState.aiStats.revenueRecaptured += 18.50;
+      } else if (dec.category === 'DELI_KITCHEN_UPCYCLING' && b) {
+        const qty = b.shelfQty;
+        b.shelfQty = 0;
+        b.status = 'rescued_deli';
+        storeState.aiStats.wasteDivertedKg += qty;
+        storeState.aiStats.co2eAvoidedKg += qty * 2.1;
+        storeState.aiStats.revenueRecaptured += 22.0;
+      } else if (dec.category === 'FOOD_BANK_DONATION' && b) {
+        const qty = b.shelfQty;
+        b.shelfQty = 0;
+        b.status = 'rescued_charity';
+        storeState.aiStats.wasteDivertedKg += qty;
+        storeState.aiStats.mealsDonated += Math.round(qty / 0.5);
+        storeState.aiStats.co2eAvoidedKg += qty * 2.2;
+      } else if (dec.category === 'FEFO_ROTATION' && b) {
+        b.shelfPosition = 'front';
+        const newer = batches.find(nb => nb.skuId === b.skuId && nb.id !== b.id && nb.hoursRemaining > b.hoursRemaining);
+        if (newer) newer.shelfPosition = 'back';
+      } else if (dec.category === 'PURCHASE_ORDER') {
+        const sku = skus.find(s => s.id === dec.skuId);
+        if (sku) {
+          const freshBatch = {
+            id: `LOT-${sku.category.slice(0, 3).toUpperCase()}-${Math.floor(200 + Math.random() * 799)}`,
+            skuId: sku.id,
+            initialQty: dec.quantity,
+            shelfQty: dec.quantity,
+            receivedDay: storeState.currentDay,
+            expiryDay: storeState.currentDay + sku.shelfLifeDays,
+            hoursRemaining: sku.shelfLifeDays * 24,
+            discount: 0,
+            status: 'optimal',
+            shelfPosition: 'back',
+            decayScore: 100
+          };
+          batches.push(freshBatch);
+        }
+      }
+
+      dec.status = 'EXECUTED';
+      dec.executedAt = new Date().toLocaleTimeString();
+      executedHistory.unshift(dec);
+      log(dec.agent, `Action Executed: ${dec.title}`, 'success');
+    }
+
+    async function advanceDay() {
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      storeState.dayOfWeek = days[(days.indexOf(storeState.dayOfWeek) + 1) % 7];
+      storeState.currentDay += 1;
+
+      batches.forEach(b => {
+        if (b.shelfQty <= 0) return;
+        const sku = skus.find(s => s.id === b.skuId);
+        const f = forecastDemand(sku, storeState.dayOfWeek, storeState.weather, b.discount);
+        const sold = Math.min(b.shelfQty, Math.round(f.p50 * (0.85 + Math.random() * 0.3)));
+        b.shelfQty -= sold;
+        b.hoursRemaining = Math.max(0, b.hoursRemaining - 24);
+
+        if (b.hoursRemaining === 0 && b.shelfQty > 0) {
+          storeState.baselineStats.totalWasteKg += b.shelfQty;
+          if (storeState.autonomousMode) {
+            storeState.aiStats.wasteDivertedKg += b.shelfQty;
+            b.shelfQty = 0;
+          }
+        }
+      });
+
+      storeState.baselineStats.totalWasteKg += 14.5;
+      storeState.baselineStats.totalWasteValue += 72.0;
+
+      historyDays.push({
+        day: storeState.currentDay,
+        baselineWasteKg: Math.round(storeState.baselineStats.totalWasteKg),
+        wasteDivertedKg: Math.round(storeState.aiStats.wasteDivertedKg)
+      });
+      if (historyDays.length > 10) historyDays.shift();
+
+      await runAgentCycle();
+      renderAll();
+    }
+
+    function applyShock(shock) {
+      if (shock === 'HEATWAVE') {
+        storeState.weather = { condition: 'Intense Heatwave (+32°C)', temperatureC: 32.5, icon: '🔥', trafficMultiplier: 1.2 };
+        skus.forEach(s => s.currentTemp = s.optimalTemp + 2.5);
+        log('SYSTEM', 'Shock Applied: Heatwave (+32°C). Refrigeration coolers under stress.', 'warning');
+      } else if (shock === 'RAIN_STORM') {
+        storeState.weather = { condition: 'Severe Torrential Rain', temperatureC: 16.0, icon: '🌧️', trafficMultiplier: 0.65 };
+        skus.forEach(s => s.currentTemp = s.optimalTemp);
+        log('SYSTEM', 'Shock Applied: Torrential Rain. Foot traffic plummeted by 35%.', 'warning');
+      } else if (shock === 'WEEKEND_RUSH') {
+        storeState.weather = { condition: 'Clear & Sunny (Peak Traffic)', temperatureC: 22.0, icon: '☀️', trafficMultiplier: 1.45 };
+        log('SYSTEM', 'Shock Applied: Saturday Traffic Surge (+45%).', 'info');
+      } else {
+        storeState.weather = { condition: 'Sunny & Mild', temperatureC: 22.0, icon: '🌤️', trafficMultiplier: 1.0 };
+        skus.forEach(s => s.currentTemp = s.optimalTemp);
+        log('SYSTEM', 'Weather normalized.', 'info');
+      }
+    }
+
+    // UI Render functions
+    function renderAll() {
+      // Header pills
+      document.getElementById('header-day-pill').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          Day ${storeState.currentDay} • ${storeState.dayOfWeek} (2:00 PM)
+        </span>
+      `;
+      document.getElementById('header-weather-pill').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+          <span>${storeState.weather.icon}</span>
+          <span>${storeState.weather.condition} (${storeState.weather.temperatureC}°C)</span>
+          <span class="text-xs text-slate-400">• Traffic: ${(storeState.weather.trafficMultiplier * 100).toFixed(0)}%</span>
+        </span>
+      `;
+      document.getElementById('header-mode-indicator').innerHTML = storeState.autonomousMode
+        ? `<span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400">🤖 Autonomous Pilot Active</span>`
+        : `<span class="inline-flex items-center gap-1 text-xs font-semibold text-amber-400">👤 Human-In-The-Loop Approval</span>`;
+
+      // KPIs
+      document.getElementById('kpi-waste-diverted-kg').textContent = `${storeState.aiStats.wasteDivertedKg.toFixed(1)} kg`;
+      document.getElementById('kpi-revenue-recaptured').textContent = `$${storeState.aiStats.revenueRecaptured.toFixed(2)}`;
+      document.getElementById('kpi-co2e-avoided').textContent = `${storeState.aiStats.co2eAvoidedKg.toFixed(1)} kg`;
+      document.getElementById('kpi-meals-donated').textContent = `${storeState.aiStats.mealsDonated} meals`;
+      document.getElementById('kpi-waste-ratio-val').textContent = `${storeState.aiStats.currentWastePercentage}%`;
+      document.getElementById('kpi-spoilage-rate-val').textContent = `${storeState.aiStats.spoilagePreventionRate}%`;
+
+      // Decision queue
+      const pending = pendingDecisions.filter(d => d.status === 'PENDING');
+      const badge = document.getElementById('pending-decisions-count');
+      badge.textContent = pending.length;
+      badge.classList.toggle('hidden', pending.length === 0);
+
+      const queue = document.getElementById('decisions-list-container');
+      if (pending.length === 0) {
+        queue.innerHTML = `
+          <div class="p-8 text-center border border-dashed border-slate-700/80 rounded-xl bg-slate-900/40">
+            <div class="text-3xl mb-2">✨</div>
+            <h4 class="text-sm font-semibold text-slate-200">All Perishable Actions Handled</h4>
+            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Zero pending actions. The multi-agent system has dynamically cleared, discounted, or routed near-expiry stock.</p>
+          </div>
+        `;
+      } else {
+        queue.innerHTML = pending.map(dec => `
+          <div class="bg-slate-900/90 border border-slate-700/80 rounded-xl p-4 shadow-lg space-y-2">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded text-[11px] font-medium border bg-amber-500/10 text-amber-400 border-amber-500/20">${dec.badge}</span>
+                  <span class="text-xs text-slate-400 font-mono">${dec.agent}</span>
+                  <span class="text-[11px] text-emerald-400 bg-emerald-500/10 px-1.5 rounded font-mono">${Math.round(dec.confidence * 100)}% conf</span>
+                </div>
+                <h4 class="text-sm font-semibold text-slate-100 mt-1">${dec.title}</h4>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="window.appExecute('${dec.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow">✓ Approve</button>
+                <button onclick="window.appInspect('${dec.id}')" class="px-2 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded border border-slate-700">🔍 Rationale</button>
+              </div>
+            </div>
+            <div class="text-xs text-slate-300 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 font-sans">
+              <span class="text-slate-500 font-bold">Action:</span> ${dec.actionRequired}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      // Executed History
+      const histContainer = document.getElementById('executed-history-container');
+      const histCount = document.getElementById('executed-history-count');
+      if (histContainer) {
+        if (histCount) histCount.textContent = `${executedHistory.length} actions executed`;
+        if (executedHistory.length === 0) {
+          histContainer.innerHTML = `<div class="text-xs text-slate-500 py-3 text-center italic">No actions executed in current session yet.</div>`;
+        } else {
+          histContainer.innerHTML = executedHistory.slice(0, 8).map(ex => `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-950/80 border border-slate-800 text-xs">
+              <div class="flex items-center gap-2">
+                <span class="text-emerald-400 font-mono text-[11px]">${ex.executedAt || 'Recent'}</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${ex.badge}</span>
+                <span class="text-slate-200 font-medium">${ex.title}</span>
+              </div>
+              <span class="text-emerald-400 font-mono font-bold text-[11px]">✓ Executed</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      // Live stream logs
+      const logContainer = document.getElementById('agent-live-logs');
+      logContainer.innerHTML = agentLogs.slice(-20).reverse().map(l => `
+        <div class="text-[12px] flex items-start gap-2 py-1 border-b border-slate-800/50">
+          <span class="text-slate-500 font-mono text-[11px] shrink-0">${l.timestamp}</span>
+          <span class="px-1.5 py-0.5 rounded text-[11px] font-mono shrink-0 text-cyan-400 bg-cyan-500/10">${l.sender}</span>
+          <span class="text-slate-300 break-words">${l.message}</span>
+        </div>
+      `).join('');
+
+      // Inventory
+      const tbody = document.getElementById('inventory-table-body');
+      const filtered = batches.filter(b => {
+        const sku = skus.find(s => s.id === b.skuId);
+        if (!sku) return false;
+        if (selectedCategory !== 'ALL' && sku.category !== selectedCategory) return false;
+        if (searchQuery && !sku.name.toLowerCase().includes(searchQuery) && !b.id.toLowerCase().includes(searchQuery)) return false;
+        return true;
+      });
+
+      tbody.innerHTML = filtered.map(b => {
+        const sku = skus.find(s => s.id === b.skuId);
+        const effectivePrice = (sku.basePrice * (1.0 - b.discount)).toFixed(2);
+        const tempDelta = Math.max(0, sku.currentTemp - sku.optimalTemp);
+        const dqi = calculateDQI(b.decayScore, tempDelta, b.hoursRemaining);
+        const hoursBadge = b.hoursRemaining <= 12 ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse font-bold' : 'bg-slate-800 text-slate-300';
+        const isFefoInverted = b.shelfPosition === 'back' && b.hoursRemaining < 48;
+
+        return `
+          <tr class="border-b border-slate-800 hover:bg-slate-900/60 text-xs">
+            <td class="py-3 px-4 flex items-center gap-2.5">
+              <span class="text-xl">${sku.icon}</span>
+              <div>
+                <div class="font-semibold text-slate-200">${sku.name}</div>
+                <div class="text-[11px] text-slate-400 font-mono">${b.id} • ${sku.category}</div>
+              </div>
+            </td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-xs font-mono ${hoursBadge}">⏱️ ${b.hoursRemaining}h left</span></td>
+            <td class="py-3 px-4">
+              <div class="w-36">
+                <div class="text-[11px] flex justify-between font-semibold mb-1">
+                  <span class="font-mono font-bold px-1.5 py-0.2 rounded border ${dqi.badgeClass}">${dqi.grade} (${dqi.score})</span>
+                  <span class="text-slate-400">${b.shelfPosition}</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-1.5"><div class="${b.decayScore < 40 ? 'bg-rose-500' : 'bg-emerald-500'} h-1.5 rounded-full" style="width:${b.decayScore}%"></div></div>
+              </div>
+            </td>
+            <td class="py-3 px-4 font-mono font-semibold">${b.shelfQty} ${sku.unit}</td>
+            <td class="py-3 px-4 font-semibold text-emerald-400">$${effectivePrice} ${b.discount > 0 ? `<span class="text-amber-400 text-[11px]">(-${Math.round(b.discount*100)}%)</span>` : ''}</td>
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <button onclick="window.appShowEsl('${b.id}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] rounded border border-slate-700">🏷️ ESL</button>
+                <button onclick="window.appShowTelemetry('${b.id}')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-[11px] rounded border border-slate-700">🔬 Telemetry</button>
+                ${isFefoInverted ? `<button onclick="window.appRotateFefo('${b.id}')" class="px-2 py-1 bg-orange-600/30 hover:bg-orange-600/50 text-orange-300 text-[11px] rounded border border-orange-500/30">🔄 Rotate</button>` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // ESL gallery
+      const eslGallery = document.getElementById('esl-gallery-container');
+      const highlighted = batches.filter(b => b.discount > 0 || b.hoursRemaining <= 36);
+      eslGallery.innerHTML = highlighted.map(b => {
+        const sku = skus.find(s => s.id === b.skuId);
+        const discPrice = (sku.basePrice * (1.0 - b.discount)).toFixed(2);
+        return `
+          <div class="bg-white text-slate-900 rounded-xl p-4 shadow-xl border-2 border-slate-300 font-sans">
+            <div class="flex items-center justify-between border-b pb-2 mb-2 text-xs font-mono">
+              <span class="font-bold text-slate-500">TAG: ESL-${b.id}</span>
+              <span class="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-bold">Zigbee Mesh Synced</span>
+            </div>
+            <div class="text-xs font-bold text-slate-600 uppercase">${sku.category}</div>
+            <div class="text-base font-extrabold text-slate-900 leading-tight mb-2">${sku.name}</div>
+            ${b.discount > 0 ? `<div class="bg-rose-600 text-white text-center py-1 rounded text-xs font-black uppercase mb-2">ZERO-WASTE FLASH: SAVE ${Math.round(b.discount*100)}%</div>` : '<div class="h-6"></div>'}
+            <div class="flex items-baseline justify-between mb-2">
+              <div class="text-3xl font-black text-slate-950">$${discPrice}</div>
+              <div class="text-xs font-mono font-bold bg-slate-100 px-2 py-1 rounded border">⏱️ ${b.hoursRemaining}h left</div>
+            </div>
+            <div class="border-t pt-2 text-[11px] text-slate-500 flex justify-between items-center">
+              <span>Shelf Stock: ${b.shelfQty} ${sku.unit}</span>
+              <button onclick="window.appShowEsl('${b.id}')" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded border">Configure</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // ESG Recipes
+      const recipeBox = document.getElementById('esg-recipes-container');
+      recipeBox.innerHTML = skus.filter(s => s.upcyclingRecipe).map(s => {
+        const avail = batches.filter(b => b.skuId === s.id && b.shelfQty > 0).reduce((sum, b) => sum + b.shelfQty, 0);
+        return `
+          <div class="bg-slate-900/80 border border-slate-700 rounded-xl p-4 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-2xl">${s.icon}</span>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${s.upcyclingRecipe.department}</span>
+              </div>
+              <h4 class="text-sm font-semibold text-slate-100">${s.upcyclingRecipe.dish}</h4>
+              <p class="text-xs text-slate-400 mt-1">${s.upcyclingRecipe.description}</p>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-800 space-y-2 text-xs">
+              <div class="flex justify-between text-slate-400"><span>Stock:</span> <b class="text-slate-200">${avail} ${s.unit}</b></div>
+              <div class="flex justify-between text-slate-400"><span>Value:</span> <b class="text-emerald-400 font-mono">$${s.upcyclingRecipe.recoveryValue.toFixed(2)}</b></div>
+              <button onclick="window.appDispatchRecipe('${s.id}')" class="w-full mt-2 py-1.5 bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-semibold rounded-lg border border-emerald-500/30 transition">
+                👨‍🍳 Dispatch Work Order
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Forecast Studio Info & Chart
+      const forecastSku = skus.find(s => s.id === selectedSkuForForecast) || skus[0];
+      const baseF = forecastDemand(forecastSku, storeState.dayOfWeek, storeState.weather, 0);
+      const stimF = forecastDemand(forecastSku, storeState.dayOfWeek, storeState.weather, simulatedDiscount);
+      const projRev = Math.round(stimF.p50 * stimF.effectivePrice * 100) / 100;
+      const baseRev = Math.round(baseF.p50 * forecastSku.basePrice * 100) / 100;
+
+      document.getElementById('forecast-sku-info').innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">${forecastSku.icon}</span>
+            <div>
+              <h4 class="text-base font-semibold text-slate-100">${forecastSku.name}</h4>
+              <div class="text-xs text-slate-400">MSRP: $${forecastSku.basePrice.toFixed(2)} • Cost: $${forecastSku.baseCost.toFixed(2)} • Elasticity ε: <span class="text-amber-400 font-mono font-bold">${forecastSku.elasticity}</span></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-800 font-sans">
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-slate-500">Projected Sales:</span>
+              <div class="text-sm font-bold text-emerald-400 font-mono">${stimF.p50} ${forecastSku.unit}/day</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">+${stimF.uplift}% vs MSRP</div>
+            </div>
+            <div class="p-2 bg-slate-900 rounded border border-slate-800">
+              <span class="text-slate-500">Projected Daily Gross:</span>
+              <div class="text-sm font-bold text-teal-300 font-mono">$${projRev.toFixed(2)}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Base: $${baseRev.toFixed(2)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      drawForecastCanvas(forecastSku);
+      drawTrendCanvas();
+    }
+
+    function drawForecastCanvas(sku) {
+      const canvas = document.getElementById('forecast-chart-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+      const baseF = days.map(d => forecastDemand(sku, d, storeState.weather, 0));
+      const stimF = days.map(d => forecastDemand(sku, d, storeState.weather, simulatedDiscount));
+
+      const p10 = baseF.map(f => f.p10);
+      const p50 = baseF.map(f => f.p50);
+      const p90 = baseF.map(f => f.p90);
+      const stim = stimF.map(f => f.p50);
+
+      const pad = { top: 35, right: 35, bottom: 45, left: 55 };
+      const chartW = w - pad.left - pad.right, chartH = h - pad.top - pad.bottom;
+      const maxVal = Math.max(...p90, ...stim) * 1.25;
+
+      // Grid
+      ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+      for (let i = 0; i <= 3; i++) {
+        const y = pad.top + (chartH / 3) * i;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+        ctx.fillStyle = '#64748b'; ctx.font = '11px sans-serif'; ctx.textAlign = 'right';
+        ctx.fillText(Math.round(maxVal - (maxVal / 3) * i), pad.left - 8, y + 4);
+      }
+
+      // Shaded confidence interval band
+      ctx.beginPath();
+      for (let i = 0; i < days.length; i++) {
+        const x = pad.left + (chartW / (days.length - 1)) * i;
+        const y = pad.top + chartH - (p90[i] / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      for (let i = days.length - 1; i >= 0; i--) {
+        const x = pad.left + (chartW / (days.length - 1)) * i;
+        const y = pad.top + chartH - (p10[i] / maxVal) * chartH;
+        ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(100, 116, 139, 0.15)';
+      ctx.fill();
+
+      // Draw baseline
+      ctx.beginPath(); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 2; ctx.setLineDash([4, 4]);
+      p50.forEach((val, i) => {
+        const x = pad.left + (chartW / (days.length - 1)) * i;
+        const y = pad.top + chartH - (val / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke(); ctx.setLineDash([]);
+
+      // Draw uplift
+      ctx.beginPath(); ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3;
+      stim.forEach((val, i) => {
+        const x = pad.left + (chartW / (days.length - 1)) * i;
+        const y = pad.top + chartH - (val / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'center';
+      shortDays.forEach((d, i) => ctx.fillText(d, pad.left + (chartW / (shortDays.length - 1)) * i, h - 15));
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#64748b'; ctx.fillText('░ P10-P90 Confidence Band', pad.left + 5, pad.top - 14);
+      ctx.fillStyle = '#94a3b8'; ctx.fillText('--- P50 Base (MSRP)', pad.left + 175, pad.top - 14);
+      ctx.fillStyle = '#10b981'; ctx.fillText(`— Velocity Boost (-${Math.round(simulatedDiscount*100)}%)`, pad.left + 310, pad.top - 14);
+    }
+
+    function drawTrendCanvas() {
+      const canvas = document.getElementById('esg-trend-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      if (historyDays.length < 2) return;
+      const pad = { top: 25, right: 30, bottom: 35, left: 45 };
+      const chartW = w - pad.left - pad.right, chartH = h - pad.top - pad.bottom;
+      const maxVal = Math.max(...historyDays.map(d => Math.max(d.baselineWasteKg, d.wasteDivertedKg))) * 1.3;
+
+      ctx.beginPath(); ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5;
+      historyDays.forEach((d, i) => {
+        const x = pad.left + (chartW / (historyDays.length - 1)) * i;
+        const y = pad.top + chartH - (d.baselineWasteKg / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.beginPath(); ctx.strokeStyle = '#10b981'; ctx.lineWidth = 2.5;
+      historyDays.forEach((d, i) => {
+        const x = pad.left + (chartW / (historyDays.length - 1)) * i;
+        const y = pad.top + chartH - (d.wasteDivertedKg / maxVal) * chartH;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8'; ctx.textAlign = 'center';
+      historyDays.forEach((d, i) => ctx.fillText(`D${d.day}`, pad.left + (chartW / (historyDays.length - 1)) * i, h - 12));
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ef4444'; ctx.fillText('— Traditional Waste (kg)', pad.left + 10, pad.top - 10);
+      ctx.fillStyle = '#10b981'; ctx.fillText('— ZeroWaste Diverted (kg)', pad.left + 180, pad.top - 10);
+    }
+
+    // Window globals
+    window.appExecute = function(id) {
+      executeDecision(id);
+      renderAll();
+    };
+
+    window.appInspect = function(id) {
+      const dec = pendingDecisions.find(d => d.id === id);
+      if (!dec) return;
+      document.getElementById('modal-rationale-title').textContent = `${dec.agent}: ${dec.title}`;
+      document.getElementById('modal-rationale-body').innerHTML = `
+        <div class="space-y-3 text-xs text-slate-300">
+          <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 font-mono">
+            <div class="text-emerald-400 font-bold mb-1">Agent Chain of Thought:</div>
+            <ul class="list-disc pl-4 space-y-1.5 text-slate-300">
+              ${dec.thoughtProcess.map(s => `<li>${s}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+            <span class="text-slate-500 font-bold">Confidence:</span> <span class="text-emerald-400 font-bold font-mono">${Math.round(dec.confidence * 100)}%</span>
+          </div>
+        </div>
+      `;
+      document.getElementById('modal-rationale').classList.remove('hidden');
+    };
+
+    window.appRotateFefo = function(batchId) {
+      const b = batches.find(batch => batch.id === batchId);
+      if (b) {
+        b.shelfPosition = 'front';
+        const newer = batches.find(nb => nb.skuId === b.skuId && nb.id !== b.id && nb.hoursRemaining > b.hoursRemaining);
+        if (newer) newer.shelfPosition = 'back';
+        log('STORE_FLOOR', `Manual FEFO Rotation: Moved ${b.id} to FRONT.`, 'info');
+        renderAll();
+      }
+    };
+
+    window.appDispatchRecipe = function(skuId) {
+      const sku = skus.find(s => s.id === skuId);
+      if (!sku || !sku.upcyclingRecipe) return;
+      const skuBatches = batches.filter(b => b.skuId === skuId && b.shelfQty > 0);
+      if (skuBatches.length === 0) {
+        alert(`No active stock of ${sku.name} available to transfer.`);
+        return;
+      }
+      let qty = 0;
+      skuBatches.forEach(b => {
+        qty += b.shelfQty;
+        b.shelfQty = 0;
+        b.status = 'rescued_deli';
+      });
+      const yieldAmt = Math.round(qty * sku.upcyclingRecipe.yieldPerKg * 10) / 10;
+      const recVal = Math.round(yieldAmt * sku.upcyclingRecipe.recoveryValue * 100) / 100;
+      storeState.aiStats.wasteDivertedKg += qty;
+      storeState.aiStats.revenueRecaptured += recVal;
+      log('DELI_KITCHEN', `Work Order Executed: Transferred ${qty} ${sku.unit} to make ${yieldAmt} units of "${sku.upcyclingRecipe.dish}" ($${recVal.toFixed(2)} retail).`, 'success');
+      renderAll();
+    };
+
+    window.appShowTelemetry = function(batchId) {
+      const b = batches.find(batch => batch.id === batchId);
+      if (!b) return;
+      const sku = skus.find(s => s.id === b.skuId);
+      const tempDelta = Math.max(0, sku.currentTemp - sku.optimalTemp);
+      const dqi = calculateDQI(b.decayScore, tempDelta, b.hoursRemaining);
+
+      document.getElementById('modal-telemetry-body').innerHTML = `
+        <div class="space-y-4 text-xs text-slate-300">
+          <div class="flex items-center gap-3 p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <span class="text-3xl">${sku.icon}</span>
+            <div>
+              <h4 class="text-sm font-bold text-slate-100">${sku.name}</h4>
+              <div class="text-slate-400 font-mono">Lot ID: ${b.id} • Arrived Day ${b.receivedDay}</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <div class="text-slate-400 font-semibold">Chiller Sensor:</div>
+              <div class="text-xl font-bold font-mono ${tempDelta > 1.5 ? 'text-rose-400' : 'text-emerald-400'}">${sku.currentTemp}°C</div>
+              <div class="text-[11px] text-slate-500">Target: ${sku.optimalTemp}°C</div>
+            </div>
+            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800">
+              <div class="text-slate-400 font-semibold">DQI Score & Grade:</div>
+              <div class="text-xl font-bold font-mono text-emerald-400">${dqi.score}/100</div>
+              <div class="text-[11px] text-emerald-400/90">${dqi.grade}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('modal-telemetry').classList.remove('hidden');
+    };
+
+    window.appShowEsl = function(batchId) {
+      currentEslBatchId = batchId;
+      const b = batches.find(batch => batch.id === batchId);
+      if (!b) return;
+      const sku = skus.find(s => s.id === b.skuId);
+      const discPrice = (sku.basePrice * (1.0 - (currentEslDiscount !== undefined ? currentEslDiscount : b.discount))).toFixed(2);
+      document.getElementById('modal-esl-card-container').innerHTML = `
+        <div class="bg-white text-slate-900 rounded-2xl p-6 shadow-2xl border-4 border-slate-400 max-w-sm mx-auto">
+          <div class="flex items-center justify-between border-b pb-2 mb-3 text-xs font-mono font-bold text-slate-500">
+            <span>ELECTRONIC SHELF LABEL #${b.id}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800">E-Ink Online</span>
+          </div>
+          <div class="text-sm font-bold text-slate-500 uppercase">${sku.category}</div>
+          <div class="text-xl font-extrabold text-slate-950">${sku.name}</div>
+          <div class="my-3 py-1 bg-amber-500 text-slate-950 text-center font-black rounded text-xs uppercase">SAVE ${Math.round(currentEslDiscount*100)}% • ZERO-WASTE SPECIAL</div>
+          <div class="flex items-baseline justify-between my-2">
+            <div class="text-4xl font-black text-slate-950">$${discPrice}</div>
+            <div class="text-right text-xs font-mono font-bold text-rose-600">Expires in ${b.hoursRemaining}h</div>
+          </div>
+          <div class="border-t pt-3 mt-3 flex justify-between text-[11px] font-mono text-slate-500">
+            <div>BATCH: ${b.id}</div>
+            <div>AISLE 4 • SHELF B</div>
+          </div>
+        </div>
+      `;
+      document.getElementById('modal-esl').classList.remove('hidden');
+    };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.querySelectorAll('[data-tab-target]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          activeTab = e.currentTarget.getAttribute('data-tab-target');
+          document.querySelectorAll('[data-tab-target]').forEach(b => {
+            const active = b.getAttribute('data-tab-target') === activeTab;
+            b.classList.toggle('tab-active', active);
+            b.classList.toggle('tab-inactive', !active);
+          });
+          document.querySelectorAll('[data-tab-content]').forEach(c => {
+            c.classList.toggle('hidden', c.getAttribute('data-tab-content') !== activeTab);
+          });
+          renderAll();
+        });
+      });
+
+      document.getElementById('btn-run-cycle').addEventListener('click', async () => {
+        await runAgentCycle();
+        renderAll();
+      });
+      document.getElementById('btn-advance-day').addEventListener('click', async () => advanceDay());
+      document.getElementById('btn-fast-forward').addEventListener('click', async () => {
+        for (let i = 0; i < 3; i++) await advanceDay();
+      });
+      document.getElementById('toggle-autonomous-mode').addEventListener('change', async (e) => {
+        storeState.autonomousMode = e.target.checked;
+        if (e.target.checked) await runAgentCycle();
+        renderAll();
+      });
+      document.querySelectorAll('[data-shock]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          applyShock(e.currentTarget.getAttribute('data-shock'));
+          await runAgentCycle();
+          renderAll();
+        });
+      });
+      document.querySelectorAll('[data-category-filter]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          selectedCategory = e.currentTarget.getAttribute('data-category-filter');
+          renderAll();
+        });
+      });
+      document.getElementById('inventory-search').addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        renderAll();
+      });
+
+      const select = document.getElementById('forecast-sku-select');
+      select.innerHTML = skus.map(s => `<option value="${s.id}">${s.icon} ${s.name} (${s.category})</option>`).join('');
+      select.addEventListener('change', (e) => {
+        selectedSkuForForecast = e.target.value;
+        renderAll();
+      });
+
+      document.getElementById('elasticity-slider').addEventListener('input', (e) => {
+        simulatedDiscount = parseInt(e.target.value) / 100;
+        document.getElementById('elasticity-discount-val').textContent = `${e.target.value}%`;
+        renderAll();
+      });
+
+      document.getElementById('btn-open-manifest').addEventListener('click', () => {
+        document.getElementById('modal-manifest-body').innerHTML = `
+          <div class="bg-white text-slate-950 p-6 rounded-xl border border-slate-300 font-sans text-xs space-y-4">
+            <div class="flex items-start justify-between border-b pb-3">
+              <div>
+                <div class="text-lg font-black text-slate-900">CERTIFIED FOOD RESCUE WAYBILL</div>
+                <div class="text-slate-500 font-mono text-[11px]">WAYBILL #: RESCUE-2026-0984 • UN SDG 12.3 VERIFIED</div>
+              </div>
+              <div class="text-right">
+                <div class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[10px] uppercase">Cold-Chain Compliant</div>
+                <div class="text-slate-500 text-[10px] mt-0.5">Date: Day ${storeState.currentDay} • 5:30 PM</div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-[11px] p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div><span class="font-bold text-slate-600">Donor:</span> ZeroWaste Mart #402</div>
+              <div><span class="font-bold text-slate-600">Charity Partner:</span> Metro Food Rescue Alliance (501c3)</div>
+            </div>
+            <table class="w-full text-left border-collapse border border-slate-200 text-[11px]">
+              <thead class="bg-slate-100 text-slate-700 font-semibold">
+                <tr><th class="p-2 border">Category</th><th class="p-2 border">Net Weight</th><th class="p-2 border">Meals Provided</th><th class="p-2 border">Tax Value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="p-2 border">Fresh Produce</td><td class="p-2 border">68.5 kg</td><td class="p-2 border">137 meals</td><td class="p-2 border">$184.20</td></tr>
+                <tr><td class="p-2 border">Dairy & Bakery</td><td class="p-2 border">53.9 kg</td><td class="p-2 border">108 meals</td><td class="p-2 border">$142.80</td></tr>
+                <tr class="bg-slate-50 font-bold"><td class="p-2 border">Cumulative Total</td><td class="p-2 border text-emerald-700">${storeState.aiStats.wasteDivertedKg.toFixed(1)} kg</td><td class="p-2 border text-purple-700">${storeState.aiStats.mealsDonated} meals</td><td class="p-2 border">$689.50</td></tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+        document.getElementById('modal-manifest').classList.remove('hidden');
+      });
+
+      document.querySelectorAll('[data-set-discount]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentEslDiscount = parseFloat(e.currentTarget.getAttribute('data-set-discount'));
+          if (currentEslBatchId) window.appShowEsl(currentEslBatchId);
+        });
+      });
+
+      document.getElementById('btn-transmit-esl-sync').addEventListener('click', () => {
+        if (!currentEslBatchId) return;
+        const b = batches.find(batch => batch.id === currentEslBatchId);
+        if (b) {
+          b.discount = currentEslDiscount;
+          b.status = 'marked_down';
+          const fb = document.getElementById('esl-sync-feedback');
+          fb.classList.remove('hidden');
+          setTimeout(() => fb.classList.add('hidden'), 3500);
+          log('ESL_GATEWAY', `Sub-GHz Sync Confirmed: Tag ESL-${b.id} refreshed to -${Math.round(b.discount*100)}%.`, 'success');
+          renderAll();
+          window.appShowEsl(b.id);
+        }
+      });
+
+      document.querySelectorAll('[data-modal-close]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.add('hidden'));
+        });
+      });
+
+      await runAgentCycle();
+      renderAll();
+    });
+  </script>
+</body>
+</html>
